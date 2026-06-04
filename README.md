@@ -5,12 +5,6 @@ A web app that automatically annotates uncommon kanji with furigana (pronunciati
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.136+-green)
 
-## Live Demo
-
-[https://kanjilens.onrender.com](https://kanjilens.onrender.com) *(Update this with your actual Render URL after deployment)*
-
-Or run locally: [How to Run Locally](#how-to-run-locally)
-
 ## What It Does
 
 Upload a Japanese `.epub` or `.txt` file → KanjiLens analyzes the text → Uncommon kanji get furigana annotations → Read in a clean, paginated viewer.
@@ -56,13 +50,15 @@ Required packages:
 ### Step 3: Run the Server
 
 ```bash
-python3 -m uvicorn app:app --reload
+python3 app.py
 ```
 
-Or simply:
-
-```bash
-python3 app.py
+You should see output like:
+```
+INFO:     Started server process [xxxxx]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 ```
 
 ### Step 4: Open in Browser
@@ -70,6 +66,15 @@ python3 app.py
 Go to [http://localhost:8000](http://localhost:8000)
 
 Upload a Japanese `.txt` or `.epub` file and start reading!
+
+### Step 5: Test It
+
+Two sample files are included in `tests/`:
+
+- `tests/test_sample.txt` — Excerpt from *Wagahai wa Neko de Aru* (吾輩は猫である)
+- `tests/test_explicit.txt` — Same text with explicit furigana in parentheses
+
+Upload either file to see furigana annotations in action.
 
 ## Project Structure
 
@@ -80,7 +85,6 @@ LucasLi-PythonProject/
 ├── parser.py               # File parser — handles EPUB and TXT formats
 ├── common_kanji.py         # JLPT N5/N4 kanji filter set
 ├── requirements.txt        # Python dependencies
-├── Procfile                # Deployment config for Render
 ├── README.md               # This file
 ├── PRD.md                  # Project Requirements Document
 ├── AI_USAGE_LOG.md         # AI usage tracking log
@@ -125,16 +129,6 @@ User uploads file (.epub or .txt)
 | **Frontend** | HTML, CSS, JavaScript (vanilla) |
 | **Kanji Processing** | pykakasi (kanji → hiragana) |
 | **EPUB Parsing** | ebooklib |
-| **Deployment** | Render |
-
-## Test It
-
-Two sample files are included in `tests/`:
-
-- `test_sample.txt` — Excerpt from *Wagahai wa Neko de Aru* (吾輩は猫である)
-- `test_explicit.txt` — Same text with explicit furigana in parentheses
-
-Upload either file to see furigana annotations in action.
 
 ## License
 
