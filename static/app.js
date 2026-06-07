@@ -13,11 +13,218 @@ const prevPageBtn = document.getElementById('prev-page');
 const nextPageBtn = document.getElementById('next-page');
 const pageInfo = document.getElementById('page-info');
 
+// Search elements
+const searchInput = document.getElementById('search-input');
+const searchBtn = document.getElementById('search-btn');
+const searchBar = document.getElementById('search-bar');
+const searchCount = document.getElementById('search-count');
+const searchPrev = document.getElementById('search-prev');
+const searchNext = document.getElementById('search-next');
+const searchClose = document.getElementById('search-close');
+
+// Vocabulary elements
+const vocabBtn = document.getElementById('vocab-btn');
+const vocabSidebar = document.getElementById('vocab-sidebar');
+const vocabClose = document.getElementById('vocab-close');
+const vocabList = document.getElementById('vocab-list');
+const vocabEmpty = document.getElementById('vocab-empty');
+
 let chapters = [];
 let currentChapter = 0;
 let currentPage = 0;
 let pages = [];
 let furiganaVisible = true;
+
+// Search state
+let searchMatches = [];
+let currentMatchIndex = -1;
+let searchQuery = '';
+
+// Vocabulary state
+let vocab = [];
+const VOCAB_KEY = 'kanjilens_vocabulary';
+
+// Load saved vocabulary from localStorage
+function loadVocab() {
+    try {
+        const saved = localStorage.getItem(VOCAB_KEY);
+        vocab = saved ? JSON.parse(saved) : [];
+    } catch {
+        vocab = [];
+    }
+    renderVocab();
+}
+
+// Save vocabulary to localStorage
+function saveVocab() {
+    localStorage.setItem(VOCAB_KEY, JSON.stringify(vocab));
+}
+
+// Render vocabulary list
+function renderVocab() {
+    vocabList.innerHTML = '';
+    if (vocab.length === 0) {
+        vocabEmpty.style.display = 'block';
+    } else {
+        vocabEmpty.style.display = 'none';
+        vocab.forEach((item, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span class="vocab-kanji">${escapeHtml(item.kanji)}</span>
+                <span class="vocab-reading">${escapeHtml(item.reading)}</span>
+                <button class="vocab-delete" data-index="${index}" title="Remove">✕</button>
+            `;
+            vocabList.appendChild(li);
+        });
+    }
+    vocabBtn.textContent = `📖 Vocab (${vocab.length})`;
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Add a word to vocabulary
+function addToVocab(kanji, reading) {
+    // Check for duplicates
+    if (vocab.some(v => v.kanji === kanji && v.reading === reading)) {
+        return;
+    }
+    vocab.push({ kanji, reading, added: new Date().toISOString() });
+    saveVocab();
+    renderVocab();
+}
+
+// Remove a word from vocabulary
+function removeFromVocab(index) {
+    vocab.splice(index, 1);
+    saveVocab();
+    renderVocab();
+}
+
+// Make ruby tags clickable for vocabulary
+function makeRubyClickable() {
+    const rubies = content.querySelectorAll('ruby');
+    rubies.forEach(ruby => {
+        ruby.style.cursor = 'pointer';
+        ruby.title = 'Click to save to vocabulary';
+        ruby.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const kanji = ruby.childNodes[0]?.textContent?.trim() || '';
+            const rt = ruby.querySelector('rt');
+            const reading = rt ? rt.textContent.trim() : '';
+            if (kanji && reading) {
+                addToVocab(kanji, reading);
+                // Visual feedback
+                ruby.style.background = '#d4edda';
+                setTimeout(() => { ruby.style.background = ''; }, 300);
+            }
+        });
+    });
+}
+
+// Vocabulary sidebar toggle
+vocabBtn.addEventListener('click', () => {
+    vocabSidebar.classList.toggle('hidden');
+});
+
+vocabClose.addEventListener('click', () => {
+    vocabSidebar.classList.add('hidden');
+});
+
+// Handle vocabulary delete clicks
+vocabList.addEventListener('click', (e) => {
+    if (e.target.classList.contains('vocab-delete')) {
+        const index = parseInt(e.target.dataset.index);
+        removeFromVocab(index);
+    }
+});
+
+// Initialize vocabulary
+loadVocab();
+
+// Search functionality
+function performSearch() {
+    const query = searchInput.value.trim();
+    if (!query) {
+        clearSearch();
+        return;
+    }
+
+    searchQuery = query;
+    searchMatches = [];
+    currentMatchIndex = -1;
+
+    // Search across all pages in current chapter
+    const rubies = content.querySelectorAll('ruby');
+    rubies.forEach((ruby, idx) => {
+        const kanji = ruby.childNodes[0]?.textContent?.trim() || '';
+        const rt = ruby.querySelector('rt');
+        const reading = rt ? rt.textContent.trim() : '';
+
+        if (kanji.includes(query) || reading.includes(query)) {
+            searchMatches.push({ element: ruby, index: idx });
+        }
+    });
+
+    if (searchMatches.length > 0) {
+        searchBar.classList.remove('hidden');
+        currentMatchIndex = 0;
+        highlightMatch();
+    } else {
+        searchCount.textContent = 'No matches';
+        searchBar.classList.remove('hidden');
+    }
+}
+
+function highlightMatch() {
+    // Clear previous highlights
+    content.querySelectorAll('.search-highlight').forEach(el => {
+        el.classList.remove('search-highlight');
+    });
+
+    if (searchMatches.length === 0) return;
+
+    const match = searchMatches[currentMatchIndex];
+    match.element.classList.add('search-highlight');
+    match.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    searchCount.textContent = `${currentMatchIndex + 1} / ${searchMatches.length}`;
+}
+
+function clearSearch() {
+    searchMatches = [];
+    currentMatchIndex = -1;
+    searchQuery = '';
+    searchBar.classList.add('hidden');
+    content.querySelectorAll('.search-highlight').forEach(el => {
+        el.classList.remove('search-highlight');
+    });
+}
+
+function nextMatch() {
+    if (searchMatches.length === 0) return;
+    currentMatchIndex = (currentMatchIndex + 1) % searchMatches.length;
+    highlightMatch();
+}
+
+function prevMatch() {
+    if (searchMatches.length === 0) return;
+    currentMatchIndex = (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length;
+    highlightMatch();
+}
+
+searchBtn.addEventListener('click', performSearch);
+searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') performSearch();
+    if (e.key === 'Escape') clearSearch();
+});
+searchNext.addEventListener('click', nextMatch);
+searchPrev.addEventListener('click', prevMatch);
+searchClose.addEventListener('click', clearSearch);
 
 // File selection
 fileInput.addEventListener('change', () => {
@@ -88,10 +295,14 @@ function loadChapter(index) {
     currentChapter = index;
     currentPage = 0;
     chapterSelect.value = index;
+    clearSearch();
 
     // Split content into paragraphs
     const html = chapters[index].content;
     content.innerHTML = html;
+
+    // Make ruby tags clickable
+    makeRubyClickable();
 
     // Paginate
     paginateContent();
@@ -149,6 +360,26 @@ function renderPage() {
     pageInfo.textContent = `Page ${currentPage + 1} of ${pages.length}`;
     prevPageBtn.disabled = currentPage === 0;
     nextPageBtn.disabled = currentPage >= pages.length - 1;
+
+    // Re-attach click handlers and re-highlight search on new page
+    makeRubyClickable();
+    if (searchQuery) {
+        // Re-run search on this page
+        const rubies = content.querySelectorAll('ruby');
+        searchMatches = [];
+        rubies.forEach((ruby, idx) => {
+            const kanji = ruby.childNodes[0]?.textContent?.trim() || '';
+            const rt = ruby.querySelector('rt');
+            const reading = rt ? rt.textContent.trim() : '';
+            if (kanji.includes(searchQuery) || reading.includes(searchQuery)) {
+                searchMatches.push({ element: ruby, index: idx });
+            }
+        });
+        if (searchMatches.length > 0) {
+            currentMatchIndex = 0;
+            highlightMatch();
+        }
+    }
 }
 
 // Chapter navigation
@@ -187,6 +418,8 @@ backBtn.addEventListener('click', () => {
     uploadBtn.disabled = true;
     content.innerHTML = '';
     chapters = [];
+    clearSearch();
+    vocabSidebar.classList.add('hidden');
 });
 
 // Keyboard navigation
@@ -205,6 +438,9 @@ document.addEventListener('keydown', (e) => {
             currentPage--;
             renderPage();
         }
+    } else if (e.key === 'Escape') {
+        clearSearch();
+        vocabSidebar.classList.add('hidden');
     }
 });
 

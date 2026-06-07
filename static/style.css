@@ -193,6 +193,196 @@ header {
     background: white;
 }
 
+/* Search */
+#search-input {
+    padding: 0.4rem 0.6rem;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    width: 120px;
+    transition: width 0.2s;
+}
+
+#search-input::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
+#search-input:focus {
+    width: 180px;
+    outline: none;
+    border-color: rgba(255,255,255,0.5);
+}
+
+#search-btn {
+    padding: 0.4rem 0.6rem;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+#search-btn:hover {
+    background: rgba(255,255,255,0.25);
+}
+
+#vocab-btn {
+    padding: 0.4rem 0.8rem;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+#vocab-btn:hover {
+    background: rgba(255,255,255,0.25);
+}
+
+/* Search bar */
+#search-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: #f5f0e8;
+    border-bottom: 1px solid #e0d5c5;
+}
+
+#search-count {
+    color: #7a6a5a;
+    font-size: 0.85rem;
+    min-width: 60px;
+    text-align: center;
+}
+
+#search-bar button {
+    padding: 0.3rem 0.6rem;
+    background: #4a3728;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+#search-bar button:hover {
+    background: #6b5340;
+}
+
+/* Vocabulary sidebar */
+#vocab-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    border-left: 1px solid #e0d5c5;
+    box-shadow: -2px 0 12px rgba(0,0,0,0.08);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+}
+
+.vocab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e0d5c5;
+    background: #4a3728;
+    color: white;
+}
+
+.vocab-header h3 {
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+#vocab-close {
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.8rem;
+}
+
+#vocab-close:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+#vocab-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    list-style: none;
+}
+
+#vocab-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid #f0ebe3;
+}
+
+#vocab-list li:hover {
+    background: #faf7f2;
+}
+
+.vocab-kanji {
+    font-size: 1.1rem;
+    color: #2c2c2c;
+    min-width: 60px;
+}
+
+.vocab-reading {
+    flex: 1;
+    color: #8b7355;
+    font-size: 0.9rem;
+}
+
+.vocab-delete {
+    background: transparent;
+    border: none;
+    color: #c9b99a;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0.2rem;
+}
+
+.vocab-delete:hover {
+    color: #a03030;
+}
+
+#vocab-empty {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: #9a8a7a;
+    font-size: 0.9rem;
+}
+
+/* Search highlight */
+.search-highlight {
+    background: #fff3cd !important;
+    border-radius: 2px;
+    padding: 0 2px;
+}
+
+/* Ruby hover effect */
+ruby:hover {
+    background: rgba(74, 55, 40, 0.08);
+    border-radius: 2px;
+}
+
 /* Reader Content */
 #reader {
     flex: 1;

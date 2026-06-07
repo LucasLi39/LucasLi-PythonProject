@@ -32,7 +32,10 @@
                     <h2 id="book-title"></h2>
                 </div>
                 <div class="header-right">
+                    <input type="text" id="search-input" placeholder="Search..." title="Search in book">
+                    <button id="search-btn" title="Search">🔍</button>
                     <button id="toggle-furigana" title="Toggle furigana annotations">あ Furigana</button>
+                    <button id="vocab-btn" title="Vocabulary list">📖 Vocab</button>
                     <select id="chapter-select" title="Jump to chapter"></select>
                 </div>
             </header>
@@ -47,6 +50,24 @@
                 <button id="next-page">Next →</button>
             </footer>
         </section>
+
+        <!-- Search Navigation -->
+        <div id="search-bar" class="hidden">
+            <span id="search-count"></span>
+            <button id="search-prev" title="Previous match">↑</button>
+            <button id="search-next" title="Next match">↓</button>
+            <button id="search-close" title="Close search">✕</button>
+        </div>
+
+        <!-- Vocabulary Sidebar -->
+        <div id="vocab-sidebar" class="hidden">
+            <div class="vocab-header">
+                <h3>📖 Vocabulary</h3>
+                <button id="vocab-close" title="Close">✕</button>
+            </div>
+            <ul id="vocab-list"></ul>
+            <p id="vocab-empty">Click any annotated kanji to save it here.</p>
+        </div>
 
         <!-- Loading indicator -->
         <div id="loading" class="hidden">
